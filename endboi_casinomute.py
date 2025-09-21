@@ -7,11 +7,13 @@ API_TOKEN = "7402083428:AAFa1rAJrZecCuMKr1iX2ZXSq7SGdHRriJo"   # если ты �
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
 
+FORBIDDEN_EMOJIS = ["🎰", "⚽", "🏀", "🎲", "🎯", "🎳"]  # ⚽ без VS16
+
 @dp.message()
 async def handle_dice(message: types.Message):
     if message.dice:
-        FORBIDDEN_EMOJIS = ["🎰", "⚽", "🏀", "🎲", "🎯", "🎳"]  # без VS16
-        emoji = message.dice.emoji.replace("\uFE0F", "")  # убираем VS16
+        # убираем Variation Selector-16
+        emoji = message.dice.emoji.replace("\uFE0F", "")
         if emoji in FORBIDDEN_EMOJIS:
             await bot.restrict_chat_member(
                 chat_id=message.chat.id,
@@ -42,5 +44,6 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
