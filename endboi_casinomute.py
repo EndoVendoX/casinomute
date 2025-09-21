@@ -6,7 +6,7 @@ import threading
 from flask import Flask
 import random  # опционально для логов keep-alive
 
-API_TOKEN = os.getenv("7402083428:AAFa1rAJrZecCuMKr1iX2ZXSq7SGdHRriJo")
+API_TOKEN = os.getenv("API_TOKEN")
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
 if not API_TOKEN:
@@ -61,5 +61,6 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
