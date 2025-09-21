@@ -10,8 +10,10 @@ dp = Dispatcher()
 @dp.message()
 async def handle_dice(message: types.Message):
     if message.dice:  # есть интерактивный emoji
-        if message.dice.emoji == "🎰":  # это слот
-            # Мутим пользователя на 15 минут
+        # список эмодзи, за которые мутим
+        forbidden_emojis = ["🎰", "⚽️", "🏀", "🎲", "🎯", "🎳"]
+        if message.dice.emoji in forbidden_emojis:
+            # Мутим пользователя на 30 минут
             await bot.restrict_chat_member(
                 chat_id=message.chat.id,
                 user_id=message.from_user.id,
@@ -22,6 +24,7 @@ async def handle_dice(message: types.Message):
                 f"{message.from_user.first_name}, ну чтож ты за лудоман. Получай 30 минут мута."
             )
             print(f"Мут: {message.from_user.full_name}, слот: {message.dice.value}")
+
 
 # --- keep-alive задача (вставлять не забыть) ---
 async def keep_alive():
@@ -40,3 +43,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
