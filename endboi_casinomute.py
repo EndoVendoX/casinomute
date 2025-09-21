@@ -28,23 +28,26 @@ async def handle_dice(message: types.Message):
 
 
 
-# --- keep-alive задача (вставлять не забыть) ---
+# --- keep-alive задача ---
 async def keep_alive():
     while True:
         try:
             await bot.get_me()
         except Exception as e:
             print("Keep-alive error:", repr(e))
-        await asyncio.sleep(5 * 60)  # пинг каждые 5 минут
-# --------------------------------------------
+        await asyncio.sleep(5 * 60)  # 5 минут
+# --------------------------------
+
+async def on_startup():
+    asyncio.create_task(keep_alive())
 
 async def main():
     print("SlotDiceBot запущен...")
-    asyncio.create_task(keep_alive())  # запускаем фоновую задачу
-    await dp.start_polling(bot)
+    await dp.start_polling(bot, on_startup=on_startup)
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
 
 
