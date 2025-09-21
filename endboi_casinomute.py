@@ -9,11 +9,10 @@ dp = Dispatcher()
 
 @dp.message()
 async def handle_dice(message: types.Message):
-    if message.dice:  # есть интерактивный emoji
-        # список эмодзи, за которые мутим
-        forbidden_emojis = ["🎰", "⚽️", "🏀", "🎲", "🎯", "🎳"]
-        if message.dice.emoji in forbidden_emojis:
-            # Мутим пользователя на 30 минут
+    if message.dice:
+        FORBIDDEN_EMOJIS = ["🎰", "⚽", "🏀", "🎲", "🎯", "🎳"]  # без VS16
+        emoji = message.dice.emoji.replace("\uFE0F", "")  # убираем VS16
+        if emoji in FORBIDDEN_EMOJIS:
             await bot.restrict_chat_member(
                 chat_id=message.chat.id,
                 user_id=message.from_user.id,
@@ -43,4 +42,5 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
