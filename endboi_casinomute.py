@@ -9,6 +9,8 @@ import random  # опционально для логов keep-alive
 API_TOKEN = os.getenv("7402083428:AAFa1rAJrZecCuMKr1iX2ZXSq7SGdHRriJo")
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
+if not API_TOKEN:
+    raise ValueError("API_TOKEN пустой! Проверь Environment Variables в Render")
 
 # Эмодзи, за которые мутим
 FORBIDDEN_EMOJIS = ["🎰", "⚽", "🏀", "🎲", "🎯", "🎳"]
@@ -59,4 +61,5 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
 
