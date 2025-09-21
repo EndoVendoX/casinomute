@@ -2,18 +2,21 @@ from datetime import timedelta
 import asyncio
 from aiogram import Bot, Dispatcher, types
 import os
+import threading
+from flask import Flask
+import random  # опционально для логов keep-alive
 
-API_TOKEN = "7402083428:AAFa1rAJrZecCuMKr1iX2ZXSq7SGdHRriJo"   # если ты уже используешь переменную окружения в Render, можно поменять на os.getenv("API_TOKEN")
+API_TOKEN = os.getenv("API_TOKEN", "токен_твоего_бота")
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
 
+# Эмодзи, за которые мутим
 FORBIDDEN_EMOJIS = ["🎰", "⚽", "🏀", "🎲", "🎯", "🎳"]
 
 @dp.message()
 async def handle_dice(message: types.Message):
     if message.dice:
         emoji = message.dice.emoji
-        # проверяем, начинается ли emoji с любого из запрещённых
         if any(emoji.startswith(e) for e in FORBIDDEN_EMOJIS):
             await bot.restrict_chat_member(
                 chat_id=message.chat.id,
@@ -26,20 +29,29 @@ async def handle_dice(message: types.Message):
             )
             print(f"Мут: {message.from_user.full_name}, слот: {message.dice.value}")
 
+# --- keep-alive через мини Flask сервер ---
+app = Flask("keep_alive")
 
+@app.route("/")
+def home():
+    return "ok"
 
-# --- keep-alive задача ---
-async def keep_alive():
+def run_web():
+    app.run(host="0.0.0.0", port=10000)
+
+# запускаем Flask в отдельном потоке
+threading.Thread(target=run_web).start()
+# --------------------------------------------
+
+async def keep_alive_logs():
+    # Дополнительно можно логировать случайные числа, чтобы видеть, что задача жива
     while True:
-        try:
-            await bot.get_me()
-        except Exception as e:
-            print("Keep-alive error:", repr(e))
-        await asyncio.sleep(5 * 60)  # 5 минут
-# --------------------------------
+        print("Keep-alive tick:", random.randint(1,100))
+        await asyncio.sleep(300)  # каждые 5 минут
 
 async def on_startup():
-    asyncio.create_task(keep_alive())
+    # Запускаем keep_alive_logs параллельно с polling
+    asyncio.create_task(keep_alive_logs())
 
 async def main():
     print("SlotDiceBot запущен...")
@@ -47,8 +59,3 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-
-
-
-
-
